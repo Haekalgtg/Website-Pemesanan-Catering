@@ -1,19 +1,19 @@
 <?php
-include '../conn.php';
+include '../koneksi.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT * FROM penjual WHERE email=?");
+    $stmt = $conn->prepare("SELECT * FROM pembeli WHERE email=?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $penjual = $stmt->get_result()->fetch_assoc();
 
     if ($penjual && password_verify($password, $penjual['password'])) {
         $_SESSION['user_id'] = $penjual['id'];
-        header("Location: home.php");
+        header("Location: homePembeli.php");
     } else {
         $error = "Email atau password salah!";
     }
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login Pemilik Catering</title>
+    <title>Login Pembeli</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">

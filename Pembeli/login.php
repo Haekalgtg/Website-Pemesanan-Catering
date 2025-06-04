@@ -9,10 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("SELECT * FROM pembeli WHERE email=?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
-    $penjual = $stmt->get_result()->fetch_assoc();
+    $pembeli = $stmt->get_result()->fetch_assoc();
 
-    if ($penjual && password_verify($password, $penjual['password'])) {
-        $_SESSION['user_id'] = $penjual['id'];
+    if ($pembeli && password_verify($password, $pembeli['password'])) {
+        $_SESSION['user_id'] = $pembeli['id'];
         header("Location: homePembeli.php");
     } else {
         $error = "Email atau password salah!";

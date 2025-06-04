@@ -76,16 +76,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'penjual') {
         </div>
 
         <div class="col-md-3">
-            <a href="dasboard.php" class="text-decoration-none">
-                <div class="card card-menu p-4">
-                    <div class="icon text-warning mb-3">📅</div>
-                    <h5 class="text-dark">Menu Hari Ini</h5>
-                    <p class="text-muted">Cek menu aktif hari ini.</p>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-md-3">
             <a href="keuangan.php" class="text-decoration-none">
                 <div class="card card-menu p-4">
                     <div class="icon text-primary mb-3">💰</div>

@@ -9,12 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $price = $_POST['price'];
     $day = $_POST['day'];
     $image = $_FILES['image']['name'];
-    move_uploaded_file($_FILES['image']['tmp_name'], "Gambar Makanan/" . $image);
+    move_uploaded_file($_FILES['image']['tmp_name'], "upload/" . $image);
 
     $stmt = $conn->prepare("INSERT INTO menus (user_id, name, description, price, image, day) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issdss", $user_id, $name, $desc, $price, $image, $day);
     $stmt->execute();
-    header("Location: homePenjual.php");
+    header("Location: home.php");
 }
 ?>
 <!DOCTYPE html>

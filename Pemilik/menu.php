@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../conn.php';
+include '../koneksi.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -31,7 +31,6 @@ if (isset($_GET['delete'])) {
     }
 }
 
-// Ambil semua menu user berdasarkan hari Senin–Sabtu
 $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 $allMenus = [];
 foreach ($hariList as $hari) {
@@ -76,7 +75,7 @@ foreach ($hariList as $hari) {
     <div class="container">
         <a class="navbar-brand" href="#">Adeeva Kitchen</a>
         <div>
-            <a href="home.php" class="btn btn-outline-light btn-sm me-2">🏠 Beranda</a>
+            <a href="homePenjual.php" class="btn btn-outline-light btn-sm me-2">🏠 Beranda</a>
             <a href="logout.php" class="btn btn-light btn-sm">Logout</a>
         </div>
     </div>

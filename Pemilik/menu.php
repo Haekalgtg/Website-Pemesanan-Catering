@@ -8,11 +8,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 $user_id = $_SESSION['user_id'];
 
-// Proses hapus jika ada parameter delete
 if (isset($_GET['delete'])) {
     $menu_id = intval($_GET['delete']);
 
-    // Pastikan menu milik user yang login
     $cek = $conn->prepare("SELECT image FROM menus WHERE id = ? AND user_id = ?");
     $cek->bind_param("ii", $menu_id, $user_id);
     $cek->execute();

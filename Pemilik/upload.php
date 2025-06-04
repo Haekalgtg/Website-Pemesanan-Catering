@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("INSERT INTO menus (user_id, name, description, price, image, day) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issdss", $user_id, $name, $desc, $price, $image, $day);
     $stmt->execute();
-    header("Location: home.php");
+    header("Location: homePenjual.php");
 }
 ?>
 <!DOCTYPE html>

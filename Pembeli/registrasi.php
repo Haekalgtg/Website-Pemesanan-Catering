@@ -1,5 +1,5 @@
 <?php
-include '../conn.php';
+include '../koneksi.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     $email = $_POST['email'];
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="bg-light">
 <div class="container mt-5 col-md-4">
-    <h3>Registrasi Pemilik Catering</h3>
+    <h3>Registrasi Pelanggan Catering</h3>
     <form method="POST">
         <input class="form-control mb-2" name="name" placeholder="Nama">
         <input class="form-control mb-2" name="email" type="email" placeholder="Email">

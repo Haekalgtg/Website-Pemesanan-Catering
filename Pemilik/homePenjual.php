@@ -1,14 +1,12 @@
 <?php
 session_start();
 
-// Proses logout jika ada parameter ?logout
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: ../index.php");
     exit();
 }
 
-// Cek apakah user adalah penjual
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'penjual') {
     header("Location: ../index.php");
     exit();
@@ -43,7 +41,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'penjual') {
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="#">KateringKu</a>
+        <a class="navbar-brand" href="#">Adeeva Kitchen</a>
         <div>
             <a href="homePenjual.php?logout=true" class="btn btn-light btn-sm">Logout</a>
         </div>

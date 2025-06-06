@@ -17,8 +17,8 @@ if (isset($_GET['delete'])) {
     $result = $cek->get_result();
 
     if ($row = $result->fetch_assoc()) {
-        if (file_exists("uploads/" . $row['image'])) {
-            unlink("uploads/" . $row['image']);
+        if (file_exists("../uploads/" . $row['image'])) {
+            unlink("../uploads/" . $row['image']);
         }
 
         $del = $conn->prepare("DELETE FROM menus WHERE id = ? AND user_id = ?");
@@ -92,7 +92,7 @@ foreach ($hariList as $hari) {
                     <?php foreach ($allMenus[$hari] as $menu): ?>
                     <div class="col-md-4">
                         <div class="card h-100">
-                            <img src="upload/<?= htmlspecialchars($menu['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($menu['name']) ?>">
+                            <img src="../uploads/<?= htmlspecialchars($menu['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($menu['name']) ?>">
                             <div class="card-body">
                                 <h5 class="card-title"><?= htmlspecialchars($menu['name']) ?></h5>
                                 <p class="card-text"><?= nl2br(htmlspecialchars($menu['description'])) ?></p>

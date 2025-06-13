@@ -73,6 +73,16 @@ CREATE TABLE notifikasi (
   FOREIGN KEY (id_user) REFERENCES penjual(id)
 );
 
+-- Tabel notifikasi_pembeli (notifikasi untuk pembeli)
+CREATE TABLE notifikasi_pembeli (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_pembeli INT,
+  isi TEXT,
+  status ENUM('belum_dibaca', 'dibaca') DEFAULT 'belum_dibaca',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_pembeli) REFERENCES pembeli(id)
+);
+
 -- Tabel ulasan (penilaian & komentar konsumen)
 CREATE TABLE ulasan (
   id INT AUTO_INCREMENT PRIMARY KEY,

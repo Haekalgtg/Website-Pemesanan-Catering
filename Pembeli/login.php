@@ -13,6 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($pembeli && password_verify($password, $pembeli['password'])) {
         $_SESSION['user_id'] = $pembeli['id'];
+        $_SESSION['id_pembeli'] = $pembeli['id'];
+        $_SESSION['pembeli'] = $pembeli['name'];
+        $_SESSION['role'] = 'pembeli'; 
+
         header("Location: homePembeli.php");
     } else {
         $error = "Email atau password salah!";

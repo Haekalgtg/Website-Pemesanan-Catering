@@ -1,15 +1,30 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (
+    !isset($_SESSION['user_id']) ||
+    !isset($_SESSION['id_pembeli']) ||
+    !isset($_SESSION['pembeli'])
+) {
     header("Location: login.php");
     exit();
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8" />
+    <?php
+    require_once '../koneksi.php'; 
+    $id_pembeli = $_SESSION['id_pembeli'];
+    $notifikasi_q = $conn->prepare("SELECT COUNT(*) as jumlah FROM notifikasi_pembeli WHERE id_pembeli = ? AND status = 'belum_dibaca'");
+    $notifikasi_q->bind_param("i", $id_pembeli);
+    $notifikasi_q->execute();
+    $notifikasi_result = $notifikasi_q->get_result()->fetch_assoc();
+    $jumlah_notifikasi = $notifikasi_result['jumlah'];
+    ?>
+
     <title>Beranda Pembeli</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
@@ -38,17 +53,28 @@ if (!isset($_SESSION['user_id'])) {
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-custom px-4">
-    <div class="container-fluid">
-        <a class="navbar-brand fs-4" href="#">Adeeva Kitchen</a>
-        <div class="d-flex">
-            <span class="me-3 align-self-center">
-                👋 Halo, <strong><?= isset($_SESSION['pembeli']) ? htmlspecialchars($_SESSION['pembeli']) : 'Pembeli' ?></strong>
-            </span>
-            <a href="logout.php" class="btn btn-warning btn-sm">🚪 Logout</a>
+<nav class="navbar navbar-expand-lg navbar-light navbar-custom mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">Adeeva Kitchen</a>
+
+        <div class="ms-auto d-flex align-items-center">
+            <a href="lihat_notifikasi.php" class="btn btn-outline-secondary position-relative me-3">
+                🔔
+                <?php if ($jumlah_notifikasi > 0): ?>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <?= $jumlah_notifikasi ?>
+                    </span>
+                <?php endif; ?>
+            </a>
+
+            <span class="me-3">👋 Halo, <strong><?= htmlspecialchars($_SESSION['pembeli']) ?></strong></span>
+
+            <a href="logout.php" class="btn btn-warning btn-sm">📒 Logout</a>
         </div>
     </div>
 </nav>
+
+
 
 <div class="container py-5">
     <div class="text-center mb-5">

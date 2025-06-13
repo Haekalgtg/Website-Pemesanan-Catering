@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+if (!isset($_SESSION['id']) || !isset($_SESSION['role'])) {
+    header("Location: ../index.php"); // arahkan kembali ke halaman login (index.php)
     exit();
 }
 ?>
@@ -43,9 +43,11 @@ if (!isset($_SESSION['user_id'])) {
         <a class="navbar-brand fs-4" href="#">Adeeva Kitchen</a>
         <div class="d-flex">
             <span class="me-3 align-self-center">
-                👋 Halo, <strong><?= isset($_SESSION['pembeli']) ? htmlspecialchars($_SESSION['pembeli']) : 'Pembeli' ?></strong>
+                👋 Halo, <strong>
+                    <?= isset($_SESSION['user']) ? htmlspecialchars($_SESSION['user']) : 'Pembeli' ?>
+                </strong>
             </span>
-            <a href="logout.php" class="btn btn-warning btn-sm">🚪 Logout</a>
+            <a href="../index.php" class="btn btn-warning btn-sm">🚪 Logout</a>
         </div>
     </div>
 </nav>
@@ -56,29 +58,27 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 
     <div class="row justify-content-center g-4">
-        <div class="col-md-4">
-            <a href="pesanMenu.php" class="text-decoration-none text-dark">
-                <div class="card card-menu p-4 text-center bg-white">
-                    <div class="icon text-success mb-3">🍱</div>
-                    <h4>Pesan Menu</h4>
-                    <p class="text-muted">Pilih menu berdasarkan hari & atur jadwal pengiriman.</p>
+        <div class="col-md-4 d-flex">
+            <div class="card card-menu p-4 text-center bg-white w-100 d-flex flex-column">
+                <div class="icon text-success mb-3">🍱</div>
+                <h4>Pesan Menu</h4>
+                <p class="text-muted">Pilih menu berdasarkan hari & atur jadwal pengiriman.</p>
+                <div class="mt-auto">
+                    <a href="pesanMenu.php" class="btn btn-primary btn-lg w-100">Pesan Menu</a>
                 </div>
-            </a>
+            </div>
         </div>
 
-        <div class="col-md-4">
-            <a href="menu.php" class="text-decoration-none text-dark">
-                <div class="card card-menu p-4 text-center bg-white">
-                    <div class="icon text-primary mb-3">📋</div>
-                    <h4>Lihat Daftar Menu</h4>
-                    <p class="text-muted">Lihat semua menu yang tersedia untuk dipesan.</p>
+        <div class="col-md-4 d-flex">
+            <div class="card card-menu p-4 text-center bg-white w-100 d-flex flex-column">
+                <div class="icon text-primary mb-3">📋</div>
+                <h4>Lihat Daftar Menu</h4>
+                <p class="text-muted">Lihat semua menu yang tersedia untuk dipesan.</p>
+                <div class="mt-auto">
+                    <a href="menu.php" class="btn btn-success btn-lg w-100">Lihat Menu</a>
                 </div>
-            </a>
+            </div>
         </div>
-    </div>
-
-    <div class="text-center mt-5">
-        <a href="../index.php" class="btn btn-danger btn-lg">🔙 Kembali ke Halaman Utama</a>
     </div>
 </div>
 </body>

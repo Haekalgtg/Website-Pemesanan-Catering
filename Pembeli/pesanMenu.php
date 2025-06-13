@@ -49,7 +49,7 @@ $menus = $koneksi->query("SELECT menus.*, penjual.name as penjual FROM menus JOI
                             <input type="date" name="tanggal_kirim" class="form-control mb-2" required>
                             <label>Alamat Kirim:</label>
                             <textarea name="alamat" class="form-control mb-2" required></textarea>
-                            <button type="submit" class="btn btn-primary w-100">Pesan Sekarang</button>
+                            <a href="pesan.php?id=<?= $menu['id'] ?>" class="btn btn-primary w-100">Pesan Sekarang</a>
                         </form>
                     </div>
                 </div>

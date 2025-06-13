@@ -1,5 +1,5 @@
 <?php
-include 'conn.php';
+include '../koneksi.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($penjual && password_verify($password, $penjual['password'])) {
         $_SESSION['user_id'] = $penjual['id'];
-        header("Location: home.php");
+        header("Location: homePenjual.php");
     } else {
         $error = "Email atau password salah!";
     }

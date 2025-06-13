@@ -1,16 +1,7 @@
 <?php
 session_start();
-
-// Proses logout jika ada parameter ?logout
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: ../index.php");
-    exit();
-}
-
-// Cek apakah user adalah penjual
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'penjual') {
-    header("Location: ../index.php");
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
     exit();
 }
 ?>
@@ -43,44 +34,34 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'penjual') {
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="#">KateringKu</a>
+        <a class="navbar-brand" href="#">🍽️ Adeeva Kitchen</a>
         <div>
-            <a href="homePenjual.php?logout=true" class="btn btn-light btn-sm">Logout</a>
+            <a href="logout.php" class="btn btn-light btn-sm">Logout</a>
         </div>
     </div>
 </nav>
 
 <div class="container text-center py-5">
     <h1 class="mb-4 text-primary">Selamat Datang, Pemilik Catering!</h1>
-    <p class="text-muted mb-5">Kelola menu dan pesanan Anda dengan mudah.</p>
+    <p class="text-muted mb-5">Kelola menu harian Anda dengan mudah.</p>
 
     <div class="row justify-content-center g-4">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <a href="upload.php" class="text-decoration-none">
                 <div class="card card-menu p-4">
                     <div class="icon text-success mb-3">➕</div>
-                    <h5 class="text-dark">Tambah Menu</h5>
-                    <p class="text-muted">Upload makanan baru.</p>
+                    <h4 class="text-dark">Tambah Menu Baru</h4>
+                    <p class="text-muted">Upload makanan untuk hari tertentu.</p>
                 </div>
             </a>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-4">
             <a href="menu.php" class="text-decoration-none">
                 <div class="card card-menu p-4">
                     <div class="icon text-info mb-3">📋</div>
-                    <h5 class="text-dark">Menu Saya</h5>
-                    <p class="text-muted">Lihat & kelola menu Anda.</p>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-md-3">
-            <a href="dasboard.php" class="text-decoration-none">
-                <div class="card card-menu p-4">
-                    <div class="icon text-warning mb-3">📅</div>
-                    <h5 class="text-dark">Menu Hari Ini</h5>
-                    <p class="text-muted">Cek menu aktif hari ini.</p>
+                    <h4 class="text-dark">Daftar Menu Saya</h4>
+                    <p class="text-muted">Lihat dan kelola semua menu yang telah Anda buat.</p>
                 </div>
             </a>
         </div>

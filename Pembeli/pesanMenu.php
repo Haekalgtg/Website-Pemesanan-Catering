@@ -17,7 +17,7 @@ $map_hari = [
 $hari = $map_hari[$hari_ini];
 
 // Ambil menu berdasarkan hari
-$menus = $koneksi->query("SELECT menus.*, penjual.name as penjual FROM menus JOIN penjual ON penjual.id = menus.user_id WHERE day = '$hari'");
+$menus = $conn->query("SELECT menus.*, penjual.name as penjual FROM menus JOIN penjual ON penjual.id = menus.user_id WHERE day = '$hari'");
 ?>
 
 <!DOCTYPE html>

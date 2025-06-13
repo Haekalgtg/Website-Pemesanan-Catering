@@ -9,20 +9,17 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'penjual') {
 
 $id_penyedia = $_SESSION['id'];
 
-// Update status pesanan
 if (isset($_POST['update_status'])) {
     $id = $_POST['id'];
     $status = $_POST['status'];
     $koneksi->query("UPDATE pesanan SET status='$status' WHERE id=$id");
 }
 
-// Hapus pesanan
 if (isset($_POST['hapus_pesanan'])) {
     $id = $_POST['id'];
     $koneksi->query("DELETE FROM pesanan WHERE id=$id");
 }
 
-// Ambil data pesanan
 $query = "SELECT p.id, b.name AS nama_konsumen, m.name AS nama_menu, p.tanggal_pesan, 
                  j.tanggal_kirim AS jadwal_pengiriman, p.status
           FROM pesanan p

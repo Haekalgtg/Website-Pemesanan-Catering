@@ -2,9 +2,14 @@
 session_start();
 $err = "";
 
-// Masuk sebagai demo (tanpa login)
+$conn = new mysqli("localhost", "root", "", "db_catering");
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+
+// Login demo
 if (isset($_POST['demo_login'])) {
-    $_SESSION['user'] = 'pembeli';
+    $_SESSION['user'] = 'demo';
     $_SESSION['id'] = 999;
     $_SESSION['role'] = 'pembeli';
     header("Location: Pembeli/homePembeli.php");
@@ -16,34 +21,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['demo_login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    if ($username === 'admin' && $password === '12345') {
-        $_SESSION['user'] = 'admin';
-        $_SESSION['id'] = 0;
+    // 🔍 Cek di tabel penjual
+    $stmt = $conn->prepare("SELECT * FROM penjual WHERE username = ? AND password = ?");
+    $stmt->bind_param("ss", $username, $password);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($penjual = $result->fetch_assoc()) {
+        $_SESSION['user'] = $penjual['username'];
+        $_SESSION['id'] = $penjual['id'];
         $_SESSION['role'] = 'penjual';
         header("Location: Pemilik/homePenjual.php");
         exit;
     }
 
-    $conn = new mysqli("localhost", "root", "", "db_catering");
-    if ($conn->connect_error) {
-        die("Koneksi gagal: " . $conn->connect_error);
-    }
-
-    $stmt = $conn->prepare("SELECT * FROM pembeli WHERE name = ? AND password = ?");
+    // 🔍 Cek di tabel pembeli
+    $stmt = $conn->prepare("SELECT * FROM pembeli WHERE username = ? AND password = ?");
     $stmt->bind_param("ss", $username, $password);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if ($result->num_rows > 0) {
-        $userData = $result->fetch_assoc();
-        $_SESSION['user'] = $userData['name'];
-        $_SESSION['id'] = $userData['id'];
+    if ($pembeli = $result->fetch_assoc()) {
+        $_SESSION['user'] = $pembeli['username'];
+        $_SESSION['id'] = $pembeli['id'];
         $_SESSION['role'] = 'pembeli';
         header("Location: Pembeli/homePembeli.php");
         exit;
-    } else {
-        $err = "Login gagal. Periksa username atau password.";
     }
+
+    $err = "Login gagal. Username atau password salah.";
 }
 ?>
 

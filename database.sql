@@ -15,11 +15,13 @@ CREATE TABLE pembeli (
 
 CREATE TABLE menus (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
     name VARCHAR(100),
     description TEXT,
     price DECIMAL(10,2),
     image VARCHAR(255),
     day ENUM('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'),
+    FOREIGN KEY (user_id) REFERENCES penjual(id)
 );
 
 -- Tabel pesanan (catat pesanan konsumen)
@@ -60,9 +62,11 @@ CREATE TABLE jadwal_pengiriman (
 -- Tabel notifikasi (notifikasi untuk pemilik)
 CREATE TABLE notifikasi (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  id_user INT,
   isi TEXT,
   status ENUM('belum_dibaca','dibaca') DEFAULT 'belum_dibaca',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_user) REFERENCES penjual(id)
 );
 
 -- Tabel ulasan (penilaian & komentar konsumen)
@@ -84,4 +88,6 @@ CREATE TABLE keuangan (
   keterangan TEXT,
   jenis ENUM('pemasukan', 'pengeluaran'),
   jumlah DECIMAL(10,2),
+  created_by INT,
+  FOREIGN KEY (created_by) REFERENCES penjual(id)
 );

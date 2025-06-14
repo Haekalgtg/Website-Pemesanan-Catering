@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['demo_login'])) {
     }
 
     // 🔍 Cek di tabel pembeli
-    $stmt = $conn->prepare("SELECT * FROM pembeli WHERE username = ? AND password = ?");
+    $stmt = $koneksi->prepare("SELECT * FROM pembeli WHERE username = ? AND password = ?");
     $stmt->bind_param("ss", $username, $password);
     $stmt->execute();
     $result = $stmt->get_result();

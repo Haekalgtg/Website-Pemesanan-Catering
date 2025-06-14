@@ -8,53 +8,74 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'pembeli') {
 }
 
 if (!isset($_GET['id'])) {
-    echo "Menu tidak ditemukan.";
+    echo "ID pesanan tidak valid.";
     exit();
 }
 
-$id_menu = intval($_GET['id']);
-$query = $koneksi->prepare("SELECT menus.*, penjual.name as penjual FROM menus JOIN penjual ON penjual.id = menus.user_id WHERE menus.id = ?");
-$query->bind_param("i", $id_menu);
-$query->execute();
-$result = $query->get_result();
-$menu = $result->fetch_assoc();
+$id_pesanan = intval($_GET['id']);
+$id_pembeli = $_SESSION['id'];
 
-if (!$menu) {
-    echo "Menu tidak ditemukan.";
+// Ambil data pesanan
+$query = $koneksi->query("SELECT * FROM pesanan WHERE id = $id_pesanan AND id_user = $id_pembeli");
+$pesanan = $query->fetch_assoc();
+
+if (!$pesanan) {
+    echo "Pesanan tidak ditemukan.";
     exit();
 }
+
+// Ambil detail dan jadwal
+$detail = $koneksi->query("SELECT menus.name, menus.image, pesanan_detail.* 
+                           FROM pesanan_detail 
+                           JOIN menus ON menus.id = pesanan_detail.id_menu 
+                           WHERE id_pesanan = $id_pesanan")->fetch_assoc();
+
+$jadwal = $koneksi->query("SELECT * FROM jadwal_pengiriman WHERE id_pesanan = $id_pesanan")->fetch_assoc();
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Pesan Menu - <?= htmlspecialchars($menu['name']) ?></title>
+    <meta charset="UTF-8">
+    <title>Rincian Pesanan #<?= $pesanan['id'] ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-<div class="container py-4 col-md-6">
-    <h3>Pesan Menu: <?= htmlspecialchars($menu['name']) ?></h3>
-    <div class="card mb-3">
-        <?php if ($menu['image']): ?>
-            <img src="../uploads/<?= htmlspecialchars($menu['image']) ?>" class="card-img-top" alt="menu">
-        <?php endif; ?>
-        <div class="card-body">
-            <p class="card-text"><?= htmlspecialchars($menu['description']) ?></p>
-            <p class="text-muted">Dibuat oleh: <?= htmlspecialchars($menu['penjual']) ?></p>
-            <p class="text-success fw-bold">Rp <?= number_format($menu['price'], 0, ',', '.') ?></p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Rincian Pesanan #<?= $pesanan['id'] ?></h4>
+                </div>
+                <div class="card-body">
+
+                    <!-- Gambar menu -->
+                    <?php if (!empty($detail['image'])): ?>
+                        <div class="text-center mb-3">
+                            <img src="../uploads/<?= htmlspecialchars($detail['image']) ?>" class="img-fluid rounded" style="max-height: 250px;" alt="Gambar Menu">
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Informasi Pesanan -->
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Nama Menu:</strong> <?= htmlspecialchars($detail['name']) ?></li>
+                        <li class="list-group-item"><strong>Jumlah:</strong> <?= $detail['jumlah'] ?> porsi</li>
+                        <li class="list-group-item"><strong>Total Harga:</strong> Rp <?= number_format($pesanan['total_harga'], 0, ',', '.') ?></li>
+                        <li class="list-group-item"><strong>Tanggal Kirim:</strong> <?= htmlspecialchars($jadwal['tanggal_kirim']) ?></li>
+                        <li class="list-group-item"><strong>Alamat Pengiriman:</strong> <?= htmlspecialchars($jadwal['alamat']) ?></li>
+                        <li class="list-group-item"><strong>Status Pesanan:</strong> 
+                            <span class="badge bg-secondary"><?= ucfirst($pesanan['status']) ?></span>
+                        </li>
+                    </ul>
+
+                </div>
+                <div class="card-footer text-end">
+                    <small class="text-muted">Dipesan pada: <?= $pesanan['created_at'] ?></small>
+                </div>
+            </div>
         </div>
     </div>
-
-    <form method="post" action="proses_pesan.php">
-        <input type="hidden" name="id_menu" value="<?= $menu['id'] ?>">
-        <label>Jumlah:</label>
-        <input type="number" name="jumlah" class="form-control mb-2" value="1" min="1" required>
-        <label>Tanggal Kirim:</label>
-        <input type="date" name="tanggal_kirim" class="form-control mb-2" required>
-        <label>Alamat Kirim:</label>
-        <textarea name="alamat" class="form-control mb-2" required></textarea>
-        <button type="submit" class="btn btn-success w-100">Konfirmasi Pesanan</button>
-    </form>
 </div>
 </body>
 </html>

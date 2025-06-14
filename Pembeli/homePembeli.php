@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['id']) || !isset($_SESSION['role'])) {
-    header("Location: ../index.php"); // arahkan kembali ke halaman login (index.php)
+    header("Location: ../index.php");
     exit();
 }
 ?>

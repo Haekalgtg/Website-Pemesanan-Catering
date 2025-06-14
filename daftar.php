@@ -2,7 +2,7 @@
 $err = $sukses = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama = $_POST['name'];
+    $username = $_POST['username'];
     $password = $_POST['password'];
 
     $conn = new mysqli("localhost", "root", "", "db_catering");
@@ -10,16 +10,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Koneksi gagal: " . $conn->connect_error);
     }
 
-    $cek = $conn->prepare("SELECT * FROM pembeli WHERE name = ?");
-    $cek->bind_param("s", $nama);
+    $cek = $conn->prepare("SELECT * FROM pembeli WHERE username = ?");
+    $cek->bind_param("s", $username);
     $cek->execute();
     $res = $cek->get_result();
 
     if ($res->num_rows > 0) {
         $err = "Nama pengguna sudah digunakan.";
     } else {
-        $stmt = $conn->prepare("INSERT INTO pembeli (name, password) VALUES (?, ?)");
-        $stmt->bind_param("ss", $nama, $password);
+        $stmt = $conn->prepare("INSERT INTO pembeli (username, password) VALUES (?, ?)");
+        $stmt->bind_param("ss", $username, $password);
         if ($stmt->execute()) {
             $sukses = "Berhasil daftar! Silakan login.";
         } else {
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2 class="text-center mb-4">📝 Daftar Akun Pembeli</h2>
     
     <form method="POST">
-        <input type="text" name="name" class="form-control mb-3" placeholder="Nama pengguna" required>
+        <input type="text" name="username" class="form-control mb-3" placeholder="Nama pengguna" required>
         <input type="password" name="password" class="form-control mb-3" placeholder="Kata sandi" required>
         <button type="submit" class="btn btn-primary w-100">Daftar</button>
     </form>

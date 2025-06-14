@@ -2,9 +2,9 @@
 session_start();
 $err = "";
 
-$conn = new mysqli("localhost", "root", "", "db_catering");
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+$koneksi = new mysqli("localhost", "root", "", "db_catering");
+if ($koneksi->connect_error) {
+    die("Koneksi gagal: " . $koneksi->connect_error);
 }
 
 // Login demo

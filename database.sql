@@ -5,17 +5,13 @@ USE db_catering;
 -- Tabel users (pemilik & konsumen)
 CREATE TABLE penjual (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    password VARCHAR(255)
-);
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
 
 CREATE TABLE pembeli (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    password VARCHAR(255)
-);
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
 
 CREATE TABLE menus (
     id INT AUTO_INCREMENT PRIMARY KEY,

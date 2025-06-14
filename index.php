@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['demo_login'])) {
     $password = $_POST['password'];
 
     // 🔍 Cek di tabel penjual
-    $stmt = $conn->prepare("SELECT * FROM penjual WHERE username = ? AND password = ?");
+    $stmt = $koneksi->prepare("SELECT * FROM penjual WHERE username = ? AND password = ?");
     $stmt->bind_param("ss", $username, $password);
     $stmt->execute();
     $result = $stmt->get_result();

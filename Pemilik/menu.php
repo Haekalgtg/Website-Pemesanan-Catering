@@ -75,7 +75,7 @@ foreach ($hariList as $hari) {
         <a class="navbar-brand" href="#">Adeeva Kitchen</a>
         <div>
             <a href="homePenjual.php" class="btn btn-outline-light btn-sm me-2">🏠 Beranda</a>
-            <a href="logout.php" class="btn btn-light btn-sm">Logout</a>
+            <a href="../index.php" class="btn btn-light btn-sm">Logout</a>
         </div>
     </div>
 </nav>

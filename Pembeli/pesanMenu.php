@@ -10,7 +10,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'pembeli') {
 
 $id_pembeli = $_SESSION['id'];
 
-// Ambil hari ini dalam bahasa Indonesia
+// Hari dalam bahasa Indonesia
 $hari_ini = date('l');
 $map_hari = [
     'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
@@ -18,8 +18,22 @@ $map_hari = [
 ];
 $hari = $map_hari[$hari_ini];
 
-// Proses jika tombol pesan ditekan
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Inisialisasi keranjang
+if (!isset($_SESSION['keranjang'])) {
+    $_SESSION['keranjang'] = [];
+}
+
+// Hapus item dari keranjang
+if (isset($_GET['hapus'])) {
+    $index = intval($_GET['hapus']);
+    if (isset($_SESSION['keranjang'][$index])) {
+        unset($_SESSION['keranjang'][$index]);
+        $_SESSION['keranjang'] = array_values($_SESSION['keranjang']);
+    }
+}
+
+// Tambah item ke keranjang
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah'])) {
     $id_menu = intval($_POST['id_menu']);
     $jumlah = intval($_POST['jumlah']);
     $tanggal_kirim = $_POST['tanggal_kirim'];
@@ -28,38 +42,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($jumlah < 1 || empty($tanggal_kirim) || empty($alamat)) {
         $error = "Semua field wajib diisi.";
     } else {
-        // Ambil data menu
         $menu = $koneksi->query("SELECT * FROM menus WHERE id = $id_menu")->fetch_assoc();
-        if (!$menu) {
-            $error = "Menu tidak ditemukan.";
-        } else {
-            $subtotal = $menu['price'] * $jumlah;
-
-            // Buat pesanan
-            $koneksi->query("INSERT INTO pesanan (id_user, tanggal_pesan, total_harga) 
-                             VALUES ($id_pembeli, CURDATE(), $subtotal)");
-            $id_pesanan = $koneksi->insert_id;
-
-            // Detail menu
-            $koneksi->query("INSERT INTO pesanan_detail (id_pesanan, id_menu, jumlah, subtotal) 
-                             VALUES ($id_pesanan, $id_menu, $jumlah, $subtotal)");
-
-            // Jadwal pengiriman (waktu default 12:00:00 siang)
-            $koneksi->query("INSERT INTO jadwal_pengiriman (id_pesanan, tanggal_kirim, waktu_kirim, alamat) 
-                             VALUES ($id_pesanan, '$tanggal_kirim', '12:00:00', '$alamat')");
-
-            // Redirect ke pesan.php untuk melihat ringkasan
-            header("Location: pesan.php?id=$id_pesanan");
-            exit();
+        if ($menu) {
+            $_SESSION['keranjang'][] = [
+                'id_menu' => $id_menu,
+                'jumlah' => $jumlah,
+                'tanggal_kirim' => $tanggal_kirim,
+                'alamat' => $alamat,
+                'name' => $menu['name'],
+                'price' => $menu['price']
+            ];
         }
     }
 }
 
-// Ambil menu hari ini
+// Ambil menu sesuai hari
 $menus = $koneksi->query("SELECT menus.*, penjual.username AS penjual 
-                          FROM menus 
-                          JOIN penjual ON penjual.id = menus.user_id 
-                          WHERE menus.day = '$hari'");
+                       FROM menus 
+                       JOIN penjual ON penjual.id = menus.user_id 
+                       WHERE menus.day = '$hari'");
 ?>
 
 <!DOCTYPE html>
@@ -71,13 +72,26 @@ $menus = $koneksi->query("SELECT menus.*, penjual.username AS penjual
 </head>
 <body class="container py-4">
     <h2>Menu Hari <?= $hari ?></h2>
-    <p>Pilih makanan untuk dipesan hari ini.</p>
+    <p>Pilih makanan untuk ditambahkan ke daftar pesanan.</p>
 
     <?php if (isset($error)): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
     <div class="row">
+        <!-- Kotak Tambah Pesan -->
+        <div class="col-md-4 mb-4">
+            <a href="pesan.php" style="text-decoration: none;">
+                <div class="card h-100 border-primary text-center d-flex justify-content-center align-items-center p-4">
+                    <div>
+                        <h5 class="text-primary">+ Tambah Pesan</h5>
+                        <p class="text-muted">Lihat detail atau riwayat pesanan Anda</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Daftar Menu Hari Ini -->
         <?php while ($menu = $menus->fetch_assoc()): ?>
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
@@ -104,12 +118,44 @@ $menus = $koneksi->query("SELECT menus.*, penjual.username AS penjual
                                 <label>Alamat Kirim:</label>
                                 <textarea name="alamat" class="form-control" required></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Pesan Sekarang</button>
+                            <button type="submit" name="tambah" class="btn btn-success w-100">Tambah Pesan</button>
                         </form>
                     </div>
                 </div>
             </div>
         <?php endwhile; ?>
     </div>
+
+    <hr class="my-4">
+
+    <h4>Daftar Pesanan Anda</h4>
+    <?php if (!empty($_SESSION['keranjang'])): ?>
+        <ul class="list-group mb-3">
+            <?php 
+            $total = 0;
+            foreach ($_SESSION['keranjang'] as $index => $item): 
+                $subtotal = $item['price'] * $item['jumlah'];
+                $total += $subtotal;
+            ?>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="me-auto">
+                        <div><strong><?= htmlspecialchars($item['name']) ?></strong> x<?= $item['jumlah'] ?></div>
+                        <div><small><?= htmlspecialchars($item['alamat']) ?> (<?= $item['tanggal_kirim'] ?>)</small></div>
+                    </div>
+                    <div class="text-end">
+                        <div>Rp <?= number_format($subtotal, 0, ',', '.') ?></div>
+                        <a href="?hapus=<?= $index ?>" class="btn btn-sm btn-outline-danger mt-1">Hapus</a>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h5>Total: Rp <?= number_format($total, 0, ',', '.') ?></h5>
+            <a href="pembayaran.php" class="btn btn-primary">Bayar</a>
+        </div>
+    <?php else: ?>
+        <p>Belum ada menu yang ditambahkan.</p>
+    <?php endif; ?>
 </body>
 </html>

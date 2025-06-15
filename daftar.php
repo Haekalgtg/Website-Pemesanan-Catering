@@ -5,12 +5,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $conn = new mysqli("localhost", "root", "", "db_catering");
-    if ($conn->connect_error) {
-        die("Koneksi gagal: " . $conn->connect_error);
-    }
+$koneksi = new mysqli("sql110.infinityfree.com", "if0_39236930", "T9GazsQgsvDaKbT", "if0_39236930_db_catering");
 
-    $cek = $conn->prepare("SELECT * FROM pembeli WHERE username = ?");
+    $cek = $koneksi->prepare("SELECT * FROM pembeli WHERE username = ?");
     $cek->bind_param("s", $username);
     $cek->execute();
     $res = $cek->get_result();
@@ -18,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($res->num_rows > 0) {
         $err = "Nama pengguna sudah digunakan.";
     } else {
-        $stmt = $conn->prepare("INSERT INTO pembeli (username, password) VALUES (?, ?)");
+        $stmt = $koneksi->prepare("INSERT INTO pembeli (username, password) VALUES (?, ?)");
         $stmt->bind_param("ss", $username, $password);
         if ($stmt->execute()) {
             $sukses = "Berhasil daftar! Silakan login.";

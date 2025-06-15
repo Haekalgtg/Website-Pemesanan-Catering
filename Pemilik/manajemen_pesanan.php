@@ -1,181 +1,93 @@
 <?php
-session_start();
-include 'koneksi.php';
+include '../koneksi.php';
 
-$err = "";
-
-// Logout jika diminta
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: index.php");
-    exit;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = $_POST['id'];
+    $status = $_POST['status'];
+    $koneksi->query("UPDATE pesanan SET status='$status' WHERE id=$id");
 }
 
-// Proses login
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    // Admin (penjual)
-    if ($username === 'admin' && $password === '12345') {
-        $_SESSION['user'] = 'admin';
-        $_SESSION['id'] = 0;
-        $_SESSION['role'] = 'penjual';
-        header("Location: index.php");
-        exit;
-    }
-
-    // Pembeli dari database
-    $stmt = $koneksi->prepare("SELECT * FROM pembeli WHERE name = ? AND password = ?");
-    $stmt->bind_param("ss", $username, $password);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $userData = $result->fetch_assoc();
-        $_SESSION['user'] = $userData['name'];
-        $_SESSION['id'] = $userData['id'];
-        $_SESSION['role'] = 'pembeli';
-        header("Location: index.php");
-        exit;
-    } else {
-        $err = "Login gagal. Silakan coba lagi.";
-    }
-}
-
-// Update atau hapus pesanan (jika penjual)
-if (isset($_SESSION['role']) && $_SESSION['role'] == 'penjual') {
-    $id_penyedia = $_SESSION['id'];
-
-    if (isset($_POST['update_status'])) {
-        $id = $_POST['id'];
-        $status = $_POST['status'];
-        $koneksi->query("UPDATE pesanan SET status='$status' WHERE id=$id");
-    }
-
-    if (isset($_POST['hapus_pesanan'])) {
-        $id = $_POST['id'];
-        $koneksi->query("DELETE FROM pesanan WHERE id=$id");
-    }
-
-    // Ambil data pesanan
-    $query = "SELECT p.id, b.name AS nama_konsumen, m.name AS nama_menu, p.tanggal_pesan, 
-                     j.tanggal_kirim AS jadwal_pengiriman, p.status
-              FROM pesanan p
-              JOIN pembeli b ON p.id_user = b.id
-              JOIN pesanan_detail pd ON p.id = pd.id_pesanan
-              JOIN menus m ON pd.id_menu = m.id
-              JOIN jadwal_pengiriman j ON p.id = j.id_pesanan
-              WHERE m.user_id = $id_penyedia
-              ORDER BY p.tanggal_pesan DESC";
-    $result = $koneksi->query($query);
-}
+$pesanan = $koneksi->query("
+    SELECT p.*, u.username, GROUP_CONCAT(m.name, ' (x', d.jumlah, ')') AS daftar_menu
+    FROM pesanan p
+    JOIN pembeli u ON p.id_user = u.id
+    JOIN pesanan_detail d ON p.id = d.id_pesanan
+    JOIN menus m ON d.id_menu = m.id
+    GROUP BY p.id
+");
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Adeevea Kitchen</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Manajemen Pesanan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-image: url('makanan.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 100vh;
+        .status-badge {
+            text-transform: capitalize;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
-        .container-box {
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 50px;
-        }
+        .menunggu { background-color: #ffc107; color: #000; }
+        .diproses { background-color: #0d6efd; color: #fff; }
+        .dikirim { background-color: #17a2b8; color: #fff; }
+        .selesai { background-color: #28a745; color: #fff; }
+        .dibatalkan { background-color: #dc3545; color: #fff; }
     </style>
 </head>
-<body class="d-flex align-items-center justify-content-center flex-column">
+<body class="bg-light">
 
-<div class="container col-md-8 container-box">
+<div class="container py-5">
+    <h2 class="mb-4 text-center text-primary">Manajemen Pesanan</h2>
+    <a href="homePenjual.php" class="btn btn-secondary mb-3">← Kembali ke Beranda</a>
 
-    <?php if (!isset($_SESSION['role'])): ?>
-        <h2 class="text-center mb-4">🍽️ Selamat Datang di Adeeva Kitchen</h2>
-
-        <form method="POST" class="mb-3">
-            <input type="text" name="username" class="form-control mb-2" placeholder="Nama pengguna" required>
-            <input type="password" name="password" class="form-control mb-3" placeholder="Kata sandi" required>
-            <button type="submit" name="login" class="btn btn-primary w-100">🔐 Login</button>
-        </form>
-
-        <?php if ($err): ?>
-            <div class="alert alert-danger"><?= $err ?></div>
-        <?php endif; ?>
-
-        <div class="d-grid gap-2 mt-3">
-            <a href="?role=guest" class="btn btn-success">🛒 Masuk tanpa login</a>
-            <a href="daftar.php" class="btn btn-outline-secondary">📝 Belum punya akun? Daftar</a>
-        </div>
-
-    <?php elseif ($_SESSION['role'] === 'penjual'): ?>
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3>📋 Manajemen Pesanan (Penjual)</h3>
-            <a href="?logout=true" class="btn btn-danger btn-sm">Logout</a>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-bordered align-middle text-center">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nama Konsumen</th>
-                        <th>Menu</th>
-                        <th>Tanggal Pesan</th>
-                        <th>Jadwal Kirim</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php while ($pesanan = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= $pesanan['id'] ?></td>
-                        <td><?= $pesanan['nama_konsumen'] ?></td>
-                        <td><?= $pesanan['nama_menu'] ?></td>
-                        <td><?= $pesanan['tanggal_pesan'] ?></td>
-                        <td><?= $pesanan['jadwal_pengiriman'] ?></td>
-                        <td>
-                            <form method="post" class="d-flex gap-2 justify-content-center">
-                                <input type="hidden" name="id" value="<?= $pesanan['id'] ?>">
-                                <select name="status" class="form-select form-select-sm w-auto">
-                                    <?php
-                                    $statuses = ['menunggu', 'diproses', 'dikirim', 'selesai'];
-                                    foreach ($statuses as $status) {
-                                        echo "<option value=\"$status\" " . ($pesanan['status'] == $status ? 'selected' : '') . ">$status</option>";
-                                    }
-                                    ?>
-                                </select>
-                                <button type="submit" name="update_status" class="btn btn-sm btn-primary">✔</button>
-                            </form>
-                        </td>
-                        <td>
-                            <form method="post" onsubmit="return confirm('Hapus pesanan ini?')">
-                                <input type="hidden" name="id" value="<?= $pesanan['id'] ?>">
-                                <button type="submit" name="hapus_pesanan" class="btn btn-sm btn-danger">🗑️</button>
-                            </form>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-                </tbody>
-            </table>
-        </div>
-
-    <?php elseif ($_SESSION['role'] === 'pembeli' || isset($_GET['role']) && $_GET['role'] === 'guest'): ?>
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3>👤 Halo, <?= $_SESSION['user'] ?? 'Tamu' ?> (Pembeli)</h3>
-            <a href="?logout=true" class="btn btn-danger btn-sm">Logout</a>
-        </div>
-        <p>Ini adalah halaman beranda pembeli. Anda bisa menambahkan fitur seperti melihat menu, keranjang, dll.</p>
-    <?php endif; ?>
+    <div class="table-responsive">
+    <table class="table table-bordered bg-white table-hover align-middle">
+        <thead class="table-primary text-center">
+            <tr>
+                <th>Pembeli</th>
+                <th>Tanggal</th>
+                <th>Menu</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Ubah Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php while ($row = $pesanan->fetch_assoc()): ?>
+            <tr>
+                <td><?= htmlspecialchars($row['username']) ?></td>
+                <td><?= $row['tanggal_pesan'] ?></td>
+                <td><?= $row['daftar_menu'] ?></td>
+                <td>Rp<?= number_format($row['total_harga'], 2, ',', '.') ?></td>
+                <td class="text-center">
+                    <span class="status-badge <?= $row['status'] ?>"><?= $row['status'] ?></span>
+                </td>
+                <td>
+                    <form method="POST" class="d-flex align-items-center gap-2">
+                        <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                        <select name="status" class="form-select form-select-sm" required>
+                            <?php
+                            $opsi = ['menunggu','diproses','dikirim','selesai','dibatalkan'];
+                            foreach ($opsi as $s) {
+                                $selected = ($row['status'] == $s) ? 'selected' : '';
+                                echo "<option value='$s' $selected>$s</option>";
+                            }
+                            ?>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-success">✔</button>
+                    </form>
+                </td>
+            </tr>
+        <?php endwhile; ?>
+        </tbody>
+    </table>
+    </div>
 </div>
 
 </body>
+
 </html>

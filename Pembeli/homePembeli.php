@@ -69,15 +69,6 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['role'])) {
             </div>
         </div>
 
-        <div class="col-md-4 d-flex">
-            <div class="card card-menu p-4 text-center bg-white w-100 d-flex flex-column">
-                <div class="icon text-primary mb-3">📋</div>
-                <h4>Lihat Daftar Menu</h4>
-                <p class="text-muted">Lihat semua menu yang tersedia untuk dipesan.</p>
-                <div class="mt-auto">
-                    <a href="menu.php" class="btn btn-success btn-lg w-100">Lihat Menu</a>
-                </div>
-            </div>
         </div>
     </div>
 </div>

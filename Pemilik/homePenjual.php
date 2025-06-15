@@ -62,27 +62,27 @@ if (!isset($_SESSION['id']) || !isset($_SESSION['role'])) {
                 <div class="card card-menu p-4">
                     <div class="icon text-info mb-3">📋</div>
                     <h4 class="text-dark">Daftar Menu Saya</h4>
-                    <p class="text-muted">Lihat dan kelola semua menu yang telah Anda buat.</p>
+                    <p class="text-muted">Lihat dan kelola semua menu anda.</p>
                 </div>
             </a>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-4">
             <a href="keuangan.php" class="text-decoration-none">
                 <div class="card card-menu p-4">
                     <div class="icon text-primary mb-3">💰</div>
-                    <h5 class="text-dark">Laporan Keuangan</h5>
+                    <h4 class="text-dark">Laporan Keuangan</h4>
                     <p class="text-muted">Catat pemasukan & pengeluaran.</p>
                 </div>
             </a>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-4">
             <a href="manajemen_pesanan.php" class="text-decoration-none">
                 <div class="card card-menu p-4">
                     <div class="icon text-danger mb-3">🧾</div>
-                    <h5 class="text-dark">Manajemen Pesanan</h5>
-                    <p class="text-muted">Kelola pesanan masuk.</p>
+                    <h5 class="text-dark">Manajemen Pesanan</h4>
+                    <p class="text-muted">Kelola pesanan masuk dari konsumen.</p>
                 </div>
             </a>
         </div>

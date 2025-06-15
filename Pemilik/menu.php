@@ -12,7 +12,7 @@ $user_id = $_SESSION['id'];
 if (isset($_GET['delete'])) {
     $menu_id = intval($_GET['delete']);
 
-    $cek = $conn->prepare("SELECT image FROM menus WHERE id = ? AND user_id = ?");
+    $cek = $koneksi->prepare("SELECT image FROM menus WHERE id = ? AND user_id = ?");
     $cek->bind_param("ii", $menu_id, $user_id);
     $cek->execute();
     $result = $cek->get_result();
@@ -22,7 +22,7 @@ if (isset($_GET['delete'])) {
             unlink("../uploads/" . $row['image']);
         }
 
-        $del = $conn->prepare("DELETE FROM menus WHERE id = ? AND user_id = ?");
+        $del = $koneksi->prepare("DELETE FROM menus WHERE id = ? AND user_id = ?");
         $del->bind_param("ii", $menu_id, $user_id);
         $del->execute();
         header("Location: menu.php");

@@ -1,13 +1,10 @@
+
 <?php
 session_start();
 $err = "";
 
-$koneksi = new mysqli("localhost", "root", "", "db_catering");
-if ($koneksi->connect_error) {
-    die("Koneksi gagal: " . $koneksi->connect_error);
-}
+$koneksi = new mysqli("sql110.infinityfree.com", "if0_39236930", "T9GazsQgsvDaKbT", "if0_39236930_db_catering");
 
-// Login demo
 if (isset($_POST['demo_login'])) {
     $_SESSION['user'] = 'demo';
     $_SESSION['id'] = 999;
@@ -16,12 +13,10 @@ if (isset($_POST['demo_login'])) {
     exit;
 }
 
-// Login biasa
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['demo_login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // 🔍 Cek di tabel penjual
     $stmt = $koneksi->prepare("SELECT * FROM penjual WHERE username = ? AND password = ?");
     $stmt->bind_param("ss", $username, $password);
     $stmt->execute();
@@ -35,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['demo_login'])) {
         exit;
     }
 
-    // 🔍 Cek di tabel pembeli
     $stmt = $koneksi->prepare("SELECT * FROM pembeli WHERE username = ? AND password = ?");
     $stmt->bind_param("ss", $username, $password);
     $stmt->execute();

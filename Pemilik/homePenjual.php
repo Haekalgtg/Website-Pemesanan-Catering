@@ -1,9 +1,10 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+if (!isset($_SESSION['id']) || !isset($_SESSION['role'])) {
+    header("Location: ../index.php"); // arahkan kembali ke halaman login (index.php)
     exit();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +37,7 @@ if (!isset($_SESSION['user_id'])) {
     <div class="container">
         <a class="navbar-brand" href="#">🍽️ Adeeva Kitchen</a>
         <div>
-            <a href="logout.php" class="btn btn-light btn-sm">Logout</a>
+            <a href="../index.php" class="btn btn-light btn-sm">Logout</a>
         </div>
     </div>
 </nav>

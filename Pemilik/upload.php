@@ -1,7 +1,7 @@
 <?php
 include '../koneksi.php';
 session_start();
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $image = $_FILES['image']['name'];
     move_uploaded_file($_FILES['image']['tmp_name'], "Gambar Makanan/" . $image);
 
-    $stmt = $conn->prepare("INSERT INTO menus (user_id, name, description, price, image, day) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $koneksi->prepare("INSERT INTO menus (user_id, name, description, price, image, day) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issdss", $user_id, $name, $desc, $price, $image, $day);
     $stmt->execute();
     header("Location: homePenjual.php");

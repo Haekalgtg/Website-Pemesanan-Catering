@@ -2,52 +2,66 @@
 session_start();
 $err = "";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$koneksi = new mysqli("localhost", "root", "", "db_catering");
+if ($koneksi->connect_error) {
+    die("Koneksi gagal: " . $koneksi->connect_error);
+}
+
+// Login demo
+if (isset($_POST['demo_login'])) {
+    $_SESSION['user'] = 'demo';
+    $_SESSION['id'] = 999;
+    $_SESSION['role'] = 'pembeli';
+    header("Location: Pembeli/homePembeli.php");
+    exit;
+}
+
+// Login biasa
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['demo_login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Login sebagai admin / penjual (sementara hardcode)
-    if ($username === 'admin' && $password === '12345') {
-        $_SESSION['user'] = 'admin';
-        $_SESSION['id'] = 0; // id dummy (karena tidak dari DB)
+    // 🔍 Cek di tabel penjual
+    $stmt = $koneksi->prepare("SELECT * FROM penjual WHERE username = ? AND password = ?");
+    $stmt->bind_param("ss", $username, $password);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($penjual = $result->fetch_assoc()) {
+        $_SESSION['user'] = $penjual['username'];
+        $_SESSION['id'] = $penjual['id'];
         $_SESSION['role'] = 'penjual';
         header("Location: Pemilik/homePenjual.php");
         exit;
     }
 
-    // Login sebagai pembeli dari database
-    $conn = new mysqli("localhost", "root", "", "db_catering");
-    if ($conn->connect_error) {
-        die("Koneksi gagal: " . $conn->connect_error);
-    }
-
-    $stmt = $conn->prepare("SELECT * FROM pembeli WHERE name = ? AND password = ?");
+    // 🔍 Cek di tabel pembeli
+    $stmt = $koneksi->prepare("SELECT * FROM pembeli WHERE username = ? AND password = ?");
     $stmt->bind_param("ss", $username, $password);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if ($result->num_rows > 0) {
-        $userData = $result->fetch_assoc();
-        $_SESSION['user'] = $userData['name'];
-        $_SESSION['id'] = $userData['id'];
+    if ($pembeli = $result->fetch_assoc()) {
+        $_SESSION['user'] = $pembeli['username'];
+        $_SESSION['id'] = $pembeli['id'];
         $_SESSION['role'] = 'pembeli';
         header("Location: Pembeli/homePembeli.php");
         exit;
-    } else {
-        $err = "Login gagal. Coba lagi.";
     }
+
+    $err = "Login gagal. Username atau password salah.";
 }
 ?>
 
-
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Selamat Datang di Sistem Katering</title>
+    <meta charset="UTF-8">
+    <title>Login - Adeeva Kitchen</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-image: url('makanan.jpg'); 
+            background-image: url('makanan.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -55,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .container {
-            background-color: rgba(255, 255, 255, 0.9); 
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             padding: 30px;
             max-width: 500px;
@@ -64,24 +78,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="d-flex align-items-center justify-content-center">
 
-<div class="container text-center">
+<div class="container text-center shadow">
     <h1 class="mb-3">🍽️ Adeeva Kitchen</h1>
-    <p class="lead">Masuk sebagai penjual atau pembeli</p>
+    <p class="lead"><strong>Makanan Selalu Fresh Setiap Harinya</strong></p>
 
     <form method="POST" class="mb-3">
         <input type="text" name="username" class="form-control mb-2" placeholder="Nama pengguna" required>
         <input type="password" name="password" class="form-control mb-3" placeholder="Kata sandi" required>
-        <button type="submit" class="btn btn-primary w-100">🔐 Login</button>
+        <button type="submit" class="btn btn-success w-100">🔐 Login</button>
     </form>
 
     <?php if ($err): ?>
         <div class="alert alert-danger"><?= $err ?></div>
     <?php endif; ?>
+    <form method="post" class="mb-2">
+        <input type="hidden" name="demo_login" value="1">
+        <button type="submit" class="btn btn-primary w-100">🛒 Masuk tanpa login</button>
+    </form>
 
-    <div class="d-grid gap-2 mt-3">
-        <a href="Pembeli/homePembeli.php" class="btn btn-success">🛒 Masuk tanpa login</a>
-        <a href="Pembeli/daftar.php" class="btn btn-outline-secondary">📝 Belum punya akun? Daftar</a>
-    </div>
+    <a href="daftar.php" class="btn btn-outline-secondary w-100">📝 Belum punya akun? Daftar</a>
 </div>
 
 </body>

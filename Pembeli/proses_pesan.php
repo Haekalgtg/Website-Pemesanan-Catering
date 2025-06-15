@@ -51,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("is", $id_pembeli, $isi);
     $stmt->execute();
 
-    // Redirect
-    header("Location: homePembeli.php?pesan=berhasil");
+    // Redirect ke form pembayaran
+    header("Location: bayar.php?id=" . $id_pesanan);
     exit();
 } else {
     header("Location: pesanMenu.php");

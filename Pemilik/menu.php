@@ -2,11 +2,12 @@
 session_start();
 include '../koneksi.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'penjual') {
+    header("Location: ../index.php");
     exit();
 }
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['id'];
+
 
 if (isset($_GET['delete'])) {
     $menu_id = intval($_GET['delete']);
@@ -32,7 +33,7 @@ if (isset($_GET['delete'])) {
 $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 $allMenus = [];
 foreach ($hariList as $hari) {
-    $stmt = $conn->prepare("SELECT * FROM menus WHERE day = ? AND user_id = ?");
+    $stmt = $koneksi->prepare("SELECT * FROM menus WHERE day = ? AND user_id = ?");
     $stmt->bind_param("si", $hari, $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -74,7 +75,7 @@ foreach ($hariList as $hari) {
         <a class="navbar-brand" href="#">Adeeva Kitchen</a>
         <div>
             <a href="homePenjual.php" class="btn btn-outline-light btn-sm me-2">🏠 Beranda</a>
-            <a href="logout.php" class="btn btn-light btn-sm">Logout</a>
+            <a href="../index.php" class="btn btn-light btn-sm">Logout</a>
         </div>
     </div>
 </nav>

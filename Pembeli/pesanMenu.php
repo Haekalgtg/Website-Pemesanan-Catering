@@ -1,8 +1,8 @@
 <?php
 session_start();
+date_default_timezone_set('Asia/Jakarta');
 include '../koneksi.php';
 
-// Cek login pembeli
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'pembeli') {
     header("Location: ../index.php");
     exit();
@@ -10,7 +10,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'pembeli') {
 
 $id_pembeli = $_SESSION['id'];
 
-// Hari dalam bahasa Indonesia
 $hari_ini = date('l');
 $map_hari = [
     'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
@@ -18,12 +17,10 @@ $map_hari = [
 ];
 $hari = $map_hari[$hari_ini];
 
-// Inisialisasi keranjang
 if (!isset($_SESSION['keranjang'])) {
     $_SESSION['keranjang'] = [];
 }
 
-// Hapus item dari keranjang
 if (isset($_GET['hapus'])) {
     $index = intval($_GET['hapus']);
     if (isset($_SESSION['keranjang'][$index])) {
@@ -32,7 +29,6 @@ if (isset($_GET['hapus'])) {
     }
 }
 
-// Tambah item ke keranjang
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah'])) {
     $id_menu = intval($_POST['id_menu']);
     $jumlah = intval($_POST['jumlah']);
@@ -56,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah'])) {
     }
 }
 
-// Ambil menu sesuai hari
 $menus = $koneksi->query("SELECT menus.*, penjual.username AS penjual 
                        FROM menus 
                        JOIN penjual ON penjual.id = menus.user_id 
@@ -71,6 +66,12 @@ $menus = $koneksi->query("SELECT menus.*, penjual.username AS penjual
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="container py-4">
+    <div class="mb-3">
+        <a href="homePembeli.php" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+    </div>
+
     <h2>Menu Hari <?= $hari ?></h2>
     <p>Pilih makanan untuk ditambahkan ke daftar pesanan.</p>
 
@@ -79,19 +80,6 @@ $menus = $koneksi->query("SELECT menus.*, penjual.username AS penjual
     <?php endif; ?>
 
     <div class="row">
-        <!-- Kotak Tambah Pesan -->
-        <div class="col-md-4 mb-4">
-            <a href="pesan.php" style="text-decoration: none;">
-                <div class="card h-100 border-primary text-center d-flex justify-content-center align-items-center p-4">
-                    <div>
-                        <h5 class="text-primary">+ Tambah Pesan</h5>
-                        <p class="text-muted">Lihat detail atau riwayat pesanan Anda</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Daftar Menu Hari Ini -->
         <?php while ($menu = $menus->fetch_assoc()): ?>
             <div class="col-md-4 mb-4">
                 <div class="card h-100">

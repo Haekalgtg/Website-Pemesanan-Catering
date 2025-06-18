@@ -8,7 +8,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'penjual') {
 
 $id_penjual = $_SESSION['id'];
 
-// Tambah catatan keuangan
 if (isset($_POST['tambah'])) {
     $tanggal = $_POST['tanggal'];
     $keterangan = $_POST['keterangan'];
@@ -20,7 +19,6 @@ if (isset($_POST['tambah'])) {
     $stmt->execute();
 }
 
-// Ambil semua catatan keuangan milik penjual
 $query = $koneksi->query("SELECT * FROM keuangan WHERE created_by = $id_penjual ORDER BY tanggal DESC");
 ?>
 
@@ -33,7 +31,15 @@ $query = $koneksi->query("SELECT * FROM keuangan WHERE created_by = $id_penjual 
 </head>
 <body class="container py-4">
 
-<h2>Laporan Keuangan</h2>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="#">Adeeva Kitchen</a>
+        <div>
+            <a href="homePenjual.php" class="btn btn-outline-light btn-sm me-2">🏠 Beranda</a>
+            <a href="../index.php" class="btn btn-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
 
 <form method="post" class="row g-3 mb-4">
     <div class="col-md-2">

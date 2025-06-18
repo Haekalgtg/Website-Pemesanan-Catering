@@ -40,9 +40,17 @@ $pesanan = $koneksi->query("
 </head>
 <body class="bg-light">
 
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="#">Adeeva Kitchen</a>
+        <div>
+            <a href="homePenjual.php" class="btn btn-outline-light btn-sm me-2">🏠 Beranda</a>
+            <a href="../index.php" class="btn btn-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
 <div class="container py-5">
-    <h2 class="mb-4 text-center text-primary">Manajemen Pesanan</h2>
-    <a href="homePenjual.php" class="btn btn-secondary mb-3">← Kembali ke Beranda</a>
 
     <div class="table-responsive">
     <table class="table table-bordered bg-white table-hover align-middle">

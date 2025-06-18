@@ -24,6 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="#">Adeeva Kitchen</a>
+        <div>
+            <a href="homePenjual.php" class="btn btn-outline-light btn-sm me-2">🏠 Beranda</a>
+            <a href="../index.php" class="btn btn-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
 <div class="container mt-5 col-md-6">
     <h3>Upload Menu Harian</h3>
     <form method="POST" enctype="multipart/form-data">
